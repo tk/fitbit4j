@@ -708,8 +708,8 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
      */
     public void addFavoriteActivity(LocalUserDetail localUser, String activityId) throws FitbitAPIException {
         setAccessToken(localUser);
-        // Example: POST /1/user/-/activities/log/favorite/123.json
-        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/activities/log/favorite/" + activityId, APIFormat.JSON);
+        // Example: POST /1/user/-/activities/favorite/123.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/activities/favorite/" + activityId, APIFormat.JSON);
         try {
             httpPost(url, null, true);
         } catch (Exception e) {
@@ -728,8 +728,8 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
      */
     public void deleteFavoriteActivity(LocalUserDetail localUser, String activityId) throws FitbitAPIException {
         setAccessToken(localUser);
-        // Example: DELETE /1/user/-/activities/log/favorite/123.json
-        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/activities/log/favorite/" + activityId, APIFormat.JSON);
+        // Example: DELETE /1/user/-/activities/favorite/123.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/activities/favorite/" + activityId, APIFormat.JSON);
         try {
             httpDelete(url, true);
         } catch (Exception e) {
