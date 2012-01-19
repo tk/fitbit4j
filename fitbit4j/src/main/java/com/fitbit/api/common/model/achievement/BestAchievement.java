@@ -12,13 +12,13 @@ import org.json.JSONObject;
  */
 public class BestAchievement {
 
-    private BestAchievementItem<Long> caloriesOut;
-    private BestAchievementItem<Long> floors;
-    private BestAchievementItem<Double> distance;
-    private BestAchievementItem<Long> steps;
-    private BestAchievementItem<Long> activeScore;
+    private BestAchievementItem caloriesOut;
+    private BestAchievementItem floors;
+    private BestAchievementItem distance;
+    private BestAchievementItem steps;
+    private BestAchievementItem activeScore;
 
-    public BestAchievement(BestAchievementItem<Long> caloriesOut, BestAchievementItem<Long> floors, BestAchievementItem<Double> distance, BestAchievementItem<Long> steps, BestAchievementItem<Long> activeScore) {
+    public BestAchievement(BestAchievementItem caloriesOut, BestAchievementItem floors, BestAchievementItem distance, BestAchievementItem steps, BestAchievementItem activeScore) {
         this.caloriesOut = caloriesOut;
         this.floors = floors;
         this.distance = distance;
@@ -28,39 +28,39 @@ public class BestAchievement {
 
     public BestAchievement(JSONObject jsonObject) throws JSONException {
         if (jsonObject.has("caloriesOut")) {
-            this.caloriesOut = new BestAchievementItem<Long>(jsonObject.getJSONObject("caloriesOut").getLong("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("caloriesOut").getString("date")).toLocalDate());
+            this.caloriesOut = new BestAchievementItem(jsonObject.getJSONObject("caloriesOut").getDouble("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("caloriesOut").getString("date")).toLocalDate());
         }
         if (jsonObject.has("floors")) {
-            this.floors = new BestAchievementItem<Long>(jsonObject.getJSONObject("floors").getLong("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("floors").getString("date")).toLocalDate());
+            this.floors = new BestAchievementItem(jsonObject.getJSONObject("floors").getDouble("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("floors").getString("date")).toLocalDate());
         }
         if (jsonObject.has("distance")) {
-            this.distance = new BestAchievementItem<Double>(jsonObject.getJSONObject("distance").getDouble("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("distance").getString("date")).toLocalDate());
+            this.distance = new BestAchievementItem(jsonObject.getJSONObject("distance").getDouble("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("distance").getString("date")).toLocalDate());
         }
         if (jsonObject.has("steps")) {
-            this.steps = new BestAchievementItem<Long>(jsonObject.getJSONObject("steps").getLong("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("steps").getString("date")).toLocalDate());
+            this.steps = new BestAchievementItem(jsonObject.getJSONObject("steps").getDouble("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("steps").getString("date")).toLocalDate());
         }
         if (jsonObject.has("activeScore")) {
-            this.activeScore = new BestAchievementItem<Long>(jsonObject.getJSONObject("activeScore").getLong("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("activeScore").getString("date")).toLocalDate());
+            this.activeScore = new BestAchievementItem(jsonObject.getJSONObject("activeScore").getDouble("value"), FitbitApiService.LOCAL_DATE_FORMATTER.parseDateTime(jsonObject.getJSONObject("activeScore").getString("date")).toLocalDate());
         }
     }
 
-    public BestAchievementItem<Long> getCaloriesOut() {
+    public BestAchievementItem getCaloriesOut() {
         return caloriesOut;
     }
 
-    public BestAchievementItem<Long> getFloors() {
+    public BestAchievementItem getFloors() {
         return floors;
     }
 
-    public BestAchievementItem<Double> getDistance() {
+    public BestAchievementItem getDistance() {
         return distance;
     }
 
-    public BestAchievementItem<Long> getSteps() {
+    public BestAchievementItem getSteps() {
         return steps;
     }
 
-    public BestAchievementItem<Long> getActiveScore() {
+    public BestAchievementItem getActiveScore() {
         return activeScore;
     }
 }

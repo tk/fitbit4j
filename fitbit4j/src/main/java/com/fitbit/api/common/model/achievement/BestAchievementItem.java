@@ -8,17 +8,17 @@ import org.joda.time.LocalDate;
  * Date: 1/17/12
  * Time: 5:37 AM
  */
-public class BestAchievementItem<T> {
+public class BestAchievementItem {
 
-    private T value;
+    private Double value;
     private LocalDate date;
 
-    public BestAchievementItem(T value, LocalDate date) {
+    public BestAchievementItem(Double value, LocalDate date) {
         this.value = value;
         this.date = date;
     }
 
-    public T getValue() {
+    public Double getValue() {
         return value;
     }
 
