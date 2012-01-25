@@ -11,12 +11,17 @@ public class Activity extends DisplayableActivity {
 
     private  String accessLevel;
     private boolean hasSpeed;
+    private Double mets;
+
     private List<ActivityLevel> activityLevels;
 
     public Activity(JSONObject json) throws JSONException {
         super(json);
         accessLevel = json.getString("accessLevel");
         hasSpeed = json.getBoolean("hasSpeed");
+        if(json.has("mets")) {
+            mets = json.getDouble("mets");
+        }
         if (json.has("activityLevels")) {
             activityLevels = jsonArrayToActivityLevelList(json.getJSONArray("activityLevels"));
         }
@@ -41,6 +46,10 @@ public class Activity extends DisplayableActivity {
 
     public boolean getHasSpeed() {
         return hasSpeed;
+    }
+
+    public Double getMets() {
+        return mets;
     }
 
     public List<ActivityLevel> getActivityLevels() {

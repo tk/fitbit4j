@@ -23,6 +23,7 @@ public class Food {
     private final double defaultServingSize;
     private final FoodUnit defaultUnit;
     private final int[] units;
+    private List<Serving> servings;
     private NutritionalValuesEntry nutritionalValues;
 
     public Food(long foodId, String name, String brand, String accessLevel, int calories, double defaultServingSize, FoodUnit defaultUnit, int[] units) {
@@ -45,6 +46,9 @@ public class Food {
         calories = json.getInt("calories");
         defaultServingSize = json.getInt("defaultServingSize");
         defaultUnit = new FoodUnit(json.getJSONObject("defaultUnit"));
+        if(json.has("servings")) {
+            servings = Serving.jsonArrayToServingList(json.getJSONArray("servings"));
+        }
         JSONObject nutritionalValuesJSON = json.optJSONObject("nutritionalValues");
         if (nutritionalValuesJSON != null) {
             nutritionalValues = new NutritionalValuesEntry(json.getJSONObject("nutritionalValues"));
@@ -119,6 +123,10 @@ public class Food {
 
     public FoodUnit getDefaultUnit() {
         return defaultUnit;
+    }
+
+    public List<Serving> getServings() {
+        return servings;
     }
 
     public NutritionalValuesEntry getNutritionalValues() {
