@@ -18,9 +18,9 @@ public class Meal {
     private final long id;
     private final String name;
     private final String description;
-    private final List<FoodLog> foods;
+    private final List<LoggedFood> foods;
 
-    public Meal(long id, String name, String description, List<FoodLog> foods) {
+    public Meal(long id, String name, String description, List<LoggedFood> foods) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -31,7 +31,7 @@ public class Meal {
         id = json.getLong("id");
         name = json.getString("name");
         description = json.getString("description");
-        foods = FoodLog.jsonArrayToFoodLogList(json.getJSONArray("foods"));
+        foods = LoggedFood.jsonArrayToLoggedFoodReferenceList(json.getJSONArray("foods"));
     }
 
     public static List<Meal> constructMeals(Response res) throws FitbitAPIException, JSONException {
@@ -56,7 +56,7 @@ public class Meal {
         return description;
     }
 
-    public final List<FoodLog> getFoods() {
+    public final List<LoggedFood> getFoods() {
         return foods;
     }
 }

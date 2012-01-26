@@ -59,7 +59,7 @@ public class LoggedFood {
         }
     }
 
-    private static List<LoggedFood> jsonArrayToLoggedFoodReferenceList(JSONArray array) throws JSONException {
+    public static List<LoggedFood> jsonArrayToLoggedFoodReferenceList(JSONArray array) throws JSONException {
         List<LoggedFood> loggedFoodList = new ArrayList<LoggedFood>(array.length());
         for (int i = 0; i < array.length(); i++) {
             JSONObject jsonLoggedFoodReference = array.getJSONObject(i);
