@@ -1136,7 +1136,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
         Response res = httpGet(url, true);
         throwExceptionIfError(res);
         try {
-            return Meal.constructMeals(res);
+            return Meal.constructMeals(res.asJSONObject().getJSONArray("meals"));
         } catch (JSONException e) {
             throw new FitbitAPIException(e.getMessage() + ": " + res.asString(), e);
         }

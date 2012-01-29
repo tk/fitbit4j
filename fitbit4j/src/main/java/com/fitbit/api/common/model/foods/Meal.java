@@ -1,7 +1,6 @@
 package com.fitbit.api.common.model.foods;
 
 import com.fitbit.api.FitbitAPIException;
-import com.fitbit.api.client.http.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,24 +17,23 @@ public class Meal {
     private final long id;
     private final String name;
     private final String description;
-    private final List<LoggedFood> foods;
+    private final List<LoggedFood> mealFoods;
 
-    public Meal(long id, String name, String description, List<LoggedFood> foods) {
+    public Meal(long id, String name, String description, List<LoggedFood> mealFoods) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.foods = foods;
+        this.mealFoods = mealFoods;
     }
 
     public Meal(JSONObject json) throws JSONException {
         id = json.getLong("id");
         name = json.getString("name");
         description = json.getString("description");
-        foods = LoggedFood.jsonArrayToLoggedFoodReferenceList(json.getJSONArray("foods"));
+        mealFoods = LoggedFood.jsonArrayToLoggedFoodReferenceList(json.getJSONArray("mealFoods"));
     }
 
-    public static List<Meal> constructMeals(Response res) throws FitbitAPIException, JSONException {
-        JSONArray array = res.asJSONArray();
+    public static List<Meal> constructMeals(JSONArray array) throws FitbitAPIException, JSONException {
         List<Meal> mealList = new ArrayList<Meal>(array.length());
         for (int i = 0; i < array.length(); i++) {
             JSONObject meal = array.getJSONObject(i);
@@ -56,7 +54,7 @@ public class Meal {
         return description;
     }
 
-    public final List<LoggedFood> getFoods() {
-        return foods;
+    public final List<LoggedFood> getMealFoods() {
+        return mealFoods;
     }
 }
