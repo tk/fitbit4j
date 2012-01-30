@@ -24,9 +24,9 @@ public class LoggedFood {
     private final int calories;
     private final double amount;
     private final FoodUnit unit;
-    private final Byte mealTypeId;
+    private final byte mealTypeId;
 
-    public LoggedFood(long foodId, String name, String brand, String accessLevel, int calories, double amount, FoodUnit unit, Byte mealTypeId, int[] units) {
+    public LoggedFood(long foodId, String name, String brand, String accessLevel, int calories, double amount, FoodUnit unit, byte mealTypeId, int[] units) {
         this.foodId = foodId;
         this.name = name;
         this.brand = brand;
@@ -48,11 +48,7 @@ public class LoggedFood {
         amount = json.getDouble("amount");
         unit = new FoodUnit(json.getJSONObject("unit"));
         //noinspection NumericCastThatLosesPrecision
-        if(json.has("mealTypeId")) {
-            mealTypeId = (byte) json.getInt("mealTypeId");
-        } else {
-            mealTypeId = null;
-        }
+        mealTypeId = (byte) json.getInt("mealTypeId");
     }
 
     public static List<LoggedFood> constructLoggedFoodReferenceList(Response res) throws FitbitAPIException {
