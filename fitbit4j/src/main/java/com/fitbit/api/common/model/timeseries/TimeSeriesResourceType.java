@@ -29,6 +29,10 @@ public enum TimeSeriesResourceType {
     ACTIVITY_CALORIES_TRACKER("/activities/tracker/activityCalories"),
     FLOORS_TRACKER("/activities/tracker/floors"),
     ELEVATION_TRACKER("/activities/tracker/elevation"),
+    MINUTES_SEDENTARY_TRACKER("/activities/tracker/minutesSedentary"),
+    MINUTES_LIGHTLY_ACTIVE_TRACKER("/activities/tracker/minutesLightlyActive"),
+    MINUTES_FAIRLY_ACTIVE_TRACKER("/activities/tracker/minutesFairlyActive"),
+    MINUTES_VERY_ACTIVE_TRACKER("/activities/tracker/minutesVeryActive"),
     //sleep
     MINUTES_ASLEEP("/sleep/minutesAsleep"),
     MINUTES_AWAKE("/sleep/minutesAwake"),
