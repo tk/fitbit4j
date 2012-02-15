@@ -6,8 +6,7 @@ import com.fitbit.api.client.http.*;
 import com.fitbit.api.common.model.achievement.Achievements;
 import com.fitbit.api.common.model.achievement.LifetimeAchievements;
 import com.fitbit.api.common.model.activities.*;
-import com.fitbit.api.common.model.body.Body;
-import com.fitbit.api.common.model.body.BodyWithGoals;
+import com.fitbit.api.common.model.body.*;
 import com.fitbit.api.common.model.bp.Bp;
 import com.fitbit.api.common.model.bp.BpLog;
 import com.fitbit.api.common.model.devices.Device;
@@ -1395,20 +1394,6 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
     }
 
     /**
-     * Log weight
-     *
-     * @param localUser authorized user
-     * @param params POST request parameters
-     *
-     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
-     * @see <a href="http://wiki.fitbit.com/display/API/API-Log-Body-Measurements">Fitbit API: API-Log-Body-Measurements</a>
-     */
-    @Deprecated
-    public void logWeight(LocalUserDetail localUser, List<PostParameter> params) throws FitbitAPIException {
-        logBody(localUser, params);
-    }
-
-    /**
      * Create log entry for a water in custom volume units
      *
      * @param localUser authorized user
@@ -2606,6 +2591,358 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
             http.removeRequestHeader("Accept-Language");
         } else {
             http.setRequestHeader("Accept-Language", locale.toString());
+        }
+    }
+
+    /**
+     * Create log entry for a weight
+     *
+     * @param localUser authorized user
+     * @param weight weight
+     * @param date Log entry date
+     *
+     * @return new weight log entry
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public WeightLog logWeight(LocalUserDetail localUser, double weight, LocalDate date) throws FitbitAPIException {
+        return logWeight(localUser, weight, date, null);
+    }
+
+    /**
+     * Create log entry for a weight
+     *
+     * @param localUser authorized user
+     * @param weight weight
+     * @param date Log entry date
+     * @param time Log entry time
+     *
+     * @return new weight log entry
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public WeightLog logWeight(LocalUserDetail localUser, double weight, LocalDate date, String time) throws FitbitAPIException {
+        List<PostParameter> params = new ArrayList<PostParameter>(4);
+        params.add(new PostParameter("date", DateTimeFormat.forPattern("yyyy-MM-dd").print(date)));
+        params.add(new PostParameter("weight", weight));
+
+        if (time != null) {
+            params.add(new PostParameter("time", time));
+        }
+
+        return logWeight(localUser, params);
+    }
+
+    public WeightLog logWeight(LocalUserDetail localUser, List<PostParameter> params) throws FitbitAPIException {
+        setAccessToken(localUser);
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/body/log/weight", APIFormat.JSON);
+
+        try {
+            Response res = httpPost(url, params.toArray(new PostParameter[params.size()]), true);
+            return new WeightLog(res.asJSONObject().getJSONObject("weightLog"));
+        } catch (FitbitAPIException e) {
+            throw new FitbitAPIException("Error logging weight: " + e, e);
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error logging weight: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's weight log entries for a given day
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param date date to retrieve data for
+     *
+     * @return weight entries for a given day
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<WeightLog> getLoggedWeight(LocalUserDetail localUser, FitbitUser fitbitUser, LocalDate date) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/228TQ4/body/log/weight/date/2010-02-25.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/weight/date/" + DateTimeFormat.forPattern("yyyy-MM-dd").print(date), APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return WeightLog.constructWeightLogList(res.asJSONObject().getJSONArray("weight"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving weight: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's weight log entries for a given days' range
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param startDate date to retrieve data from
+     * @param endDate date to retrieve data to
+     *
+     * @return weight entries days' range
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<WeightLog> getLoggedWeight(LocalUserDetail localUser, FitbitUser fitbitUser, LocalDate startDate, LocalDate endDate) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/228TQ4/body/log/weight/date/2010-02-25/2010-02-28.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/weight/date/" +
+                DateTimeFormat.forPattern("yyyy-MM-dd").print(startDate) + "/" + DateTimeFormat.forPattern("yyyy-MM-dd").print(endDate), APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return WeightLog.constructWeightLogList(res.asJSONObject().getJSONArray("weight"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving weight: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's weight log entries for a given days' period
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param endDate date to retrieve data to
+     * @param period data period
+     *
+     * @return weight entries for a given day
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<WeightLog> getLoggedWeight(LocalUserDetail localUser, FitbitUser fitbitUser, LocalDate endDate, DataPeriod period) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/228TQ4/body/log/weight/date/2010-02-25/30d.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/weight/date/" +
+                DateTimeFormat.forPattern("yyyy-MM-dd").print(endDate) + "/" + period.getShortForm(), APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return WeightLog.constructWeightLogList(res.asJSONObject().getJSONArray("weight"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving weight: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's weight log entries
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param dateUrl date url part
+     *
+     * @return weight entries
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<WeightLog> getLoggedWeight(LocalUserDetail localUser, FitbitUser fitbitUser, String dateUrl) throws FitbitAPIException {
+        setAccessToken(localUser);
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/weight/date/" + dateUrl, APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return WeightLog.constructWeightLogList(res.asJSONObject().getJSONArray("weight"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving weight: " + e, e);
+        }
+    }
+
+    /**
+     * Delete user's weight log entry with the given id
+     *
+     * @param localUser authorized user
+     * @param logId Weight log entry id
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public void deleteWeight(LocalUserDetail localUser, String logId) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: DELETE /1/user/-/body/log/weight/123.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(),
+                "/user/-/body/log/weight/" + logId, APIFormat.JSON);
+        try {
+            httpDelete(url, true);
+        } catch (Exception e) {
+            throw new FitbitAPIException("Error deleting weight: " + e, e);
+        }
+    }
+
+    /**
+     * Create log entry for a fat
+     *
+     * @param localUser authorized user
+     * @param fat fat
+     * @param date Log entry date
+     *
+     * @return new fat log entry
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public FatLog logFat(LocalUserDetail localUser, double fat, LocalDate date) throws FitbitAPIException {
+        return logFat(localUser, fat, date, null);
+    }
+
+    /**
+     * Create log entry for a fat
+     *
+     * @param localUser authorized user
+     * @param fat fat
+     * @param date Log entry date
+     * @param time Log entry time
+     *
+     * @return new fat log entry
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public FatLog logFat(LocalUserDetail localUser, double fat, LocalDate date, String time) throws FitbitAPIException {
+        List<PostParameter> params = new ArrayList<PostParameter>(4);
+        params.add(new PostParameter("date", DateTimeFormat.forPattern("yyyy-MM-dd").print(date)));
+        params.add(new PostParameter("fat", fat));
+
+        if (time != null) {
+            params.add(new PostParameter("time", time));
+        }
+
+        return logFat(localUser, params);
+    }
+
+    public FatLog logFat(LocalUserDetail localUser, List<PostParameter> params) throws FitbitAPIException {
+        setAccessToken(localUser);
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/body/log/fat", APIFormat.JSON);
+
+        try {
+            Response res = httpPost(url, params.toArray(new PostParameter[params.size()]), true);
+            return new FatLog(res.asJSONObject().getJSONObject("fatLog"));
+        } catch (FitbitAPIException e) {
+            throw new FitbitAPIException("Error logging fat: " + e, e);
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error logging fat: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's fat log entries for a given day
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param date date to retrieve data for
+     *
+     * @return fat entries for a given day
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<FatLog> getLoggedFat(LocalUserDetail localUser, FitbitUser fitbitUser, LocalDate date) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/228TQ4/body/log/fat/date/2010-02-25.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/fat/date/" + DateTimeFormat.forPattern("yyyy-MM-dd").print(date), APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return FatLog.constructFatLogList(res.asJSONObject().getJSONArray("fat"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving fat: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's fat log entries for a given days' range
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param startDate date to retrieve data from
+     * @param endDate date to retrieve data to
+     *
+     * @return fat entries days' range
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<FatLog> getLoggedFat(LocalUserDetail localUser, FitbitUser fitbitUser, LocalDate startDate, LocalDate endDate) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/228TQ4/body/log/fat/date/2010-02-25/2010-02-28.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/fat/date/" +
+                DateTimeFormat.forPattern("yyyy-MM-dd").print(startDate) + "/" + DateTimeFormat.forPattern("yyyy-MM-dd").print(endDate), APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return FatLog.constructFatLogList(res.asJSONObject().getJSONArray("fat"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving fat: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's fat log entries for a given days' period
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param endDate date to retrieve data to
+     * @param period data period
+     *
+     * @return fat entries for a given day
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<FatLog> getLoggedFat(LocalUserDetail localUser, FitbitUser fitbitUser, LocalDate endDate, DataPeriod period) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/228TQ4/body/log/fat/date/2010-02-25/30d.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/fat/date/" +
+                DateTimeFormat.forPattern("yyyy-MM-dd").print(endDate) + "/" + period.getShortForm(), APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return FatLog.constructFatLogList(res.asJSONObject().getJSONArray("fat"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving fat: " + e, e);
+        }
+    }
+
+    /**
+     * Get list of a user's fat log entries
+     *
+     * @param localUser authorized user
+     * @param fitbitUser user to retrieve data from
+     * @param dateUrl date url part
+     *
+     * @return fat entries
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<FatLog> getLoggedFat(LocalUserDetail localUser, FitbitUser fitbitUser, String dateUrl) throws FitbitAPIException {
+        setAccessToken(localUser);
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/" + fitbitUser.getId() + "/body/log/fat/date/" + dateUrl, APIFormat.JSON);
+
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return FatLog.constructFatLogList(res.asJSONObject().getJSONArray("fat"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error retrieving fat: " + e, e);
+        }
+    }
+
+    /**
+     * Delete user's fat log entry with the given id
+     *
+     * @param localUser authorized user
+     * @param logId Fat log entry id
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public void deleteFat(LocalUserDetail localUser, String logId) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: DELETE /1/user/-/body/log/fat/123.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(),
+                "/user/-/body/log/fat/" + logId, APIFormat.JSON);
+        try {
+            httpDelete(url, true);
+        } catch (Exception e) {
+            throw new FitbitAPIException("Error deleting fat: " + e, e);
         }
     }
 }
