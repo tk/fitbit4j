@@ -11,6 +11,7 @@ import java.util.List;
 
 public class FitbitApiError {
 	public enum ErrorType {
+		Oauth("Oauth"),
 		System("system"),
 		Validation("validation"),
 		Request("request");
