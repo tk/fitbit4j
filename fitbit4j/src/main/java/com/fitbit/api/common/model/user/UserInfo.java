@@ -26,6 +26,7 @@ public class UserInfo {
     private final String state;
     private final String city;
     private final String aboutMe;
+    private final LocalDate memberSince;
     private final DateTimeZone timezone;
     /**
      * Millisecond offset to add to UTC to get timezone
@@ -33,6 +34,12 @@ public class UserInfo {
     private final int offsetFromUTCMillis;
     private String locale;
     private final String avatar;
+
+    private String weightUnit;
+    private String distanceUnit;
+    private String heightUnit;
+    private String waterUnit;
+    private String glucoseUnit;
 
     public UserInfo(JSONObject json) throws JSONException {
         JSONObject userJson = json.getJSONObject("user");
@@ -50,10 +57,16 @@ public class UserInfo {
         state = userJson.optString("state");
         city = userJson.optString("city");
         aboutMe = userJson.optString("aboutMe");
+        memberSince = FitbitApiService.getValidLocalDateOrNull(userJson.optString("memberSince"));
         timezone = DateTimeZone.forID(userJson.getString("timezone"));
         offsetFromUTCMillis = userJson.optInt("offsetFromUTCMillis");
         locale = userJson.optString("locale");
         avatar = userJson.optString("avatar");
+        weightUnit = userJson.optString("weightUnit");
+        distanceUnit = userJson.optString("distanceUnit");
+        heightUnit = userJson.optString("weightUnit");
+        waterUnit = userJson.optString("weightUnit");
+        glucoseUnit = userJson.optString("weightUnit");
     }
 
     public static List<UserInfo> friendJsonArrayToUserInfoList(JSONArray array) throws JSONException {
@@ -126,6 +139,10 @@ public class UserInfo {
         return aboutMe;
     }
 
+    public LocalDate getMemberSince() {
+        return memberSince;
+    }
+
     public String getTimezone() {
         return timezone.toString();
     }
@@ -144,5 +161,25 @@ public class UserInfo {
 
     public String getAvatar() {
         return avatar;
+    }
+
+    public String getGlucoseUnit() {
+        return glucoseUnit;
+    }
+
+    public String getWaterUnit() {
+        return waterUnit;
+    }
+
+    public String getHeightUnit() {
+        return heightUnit;
+    }
+
+    public String getDistanceUnit() {
+        return distanceUnit;
+    }
+
+    public String getWeightUnit() {
+        return weightUnit;
     }
 }
