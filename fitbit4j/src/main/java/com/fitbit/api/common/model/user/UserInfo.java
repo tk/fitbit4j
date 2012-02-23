@@ -31,30 +31,8 @@ public class UserInfo {
      * Millisecond offset to add to UTC to get timezone
      */
     private final int offsetFromUTCMillis;
+    private String locale;
     private final String avatar;
-
-    public UserInfo(String encodedId, String displayName, Gender gender, LocalDate dateOfBirth,
-                    double height, double weight, double strideLengthWalking, double strideLengthRunning, String fullName,
-                    String nickname, String country, String state, String city, String aboutMe, DateTimeZone timezone, int offsetFromUTCMillis,
-                    String avatar) {
-        this.encodedId = encodedId;
-        this.displayName = displayName;
-        this.gender = gender;
-        this.dateOfBirth = dateOfBirth;
-        this.height = height;
-        this.weight = weight;
-        this.strideLengthWalking = strideLengthWalking;
-        this.strideLengthRunning = strideLengthRunning;
-        this.fullName = fullName;
-        this.nickname = nickname;
-        this.country = country;
-        this.state = state;
-        this.city = city;
-        this.aboutMe = aboutMe;
-        this.timezone = timezone;
-        this.offsetFromUTCMillis = offsetFromUTCMillis;
-        this.avatar = avatar;
-    }
 
     public UserInfo(JSONObject json) throws JSONException {
         JSONObject userJson = json.getJSONObject("user");
@@ -74,6 +52,7 @@ public class UserInfo {
         aboutMe = userJson.optString("aboutMe");
         timezone = DateTimeZone.forID(userJson.getString("timezone"));
         offsetFromUTCMillis = userJson.optInt("offsetFromUTCMillis");
+        locale = userJson.optString("locale");
         avatar = userJson.optString("avatar");
     }
 
@@ -157,6 +136,10 @@ public class UserInfo {
 
     public int getOffsetFromUTCMillis() {
         return offsetFromUTCMillis;
+    }
+
+    public String getLocale() {
+        return locale;
     }
 
     public String getAvatar() {
