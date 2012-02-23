@@ -385,7 +385,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
                             int durationMillis,
                             float distance,
                             LocalDate date,
-                            LocalDate startTime) throws FitbitAPIException {
+                            LocalTime startTime) throws FitbitAPIException {
 
         List<PostParameter> params = new ArrayList<PostParameter>(5);
         params.add(new PostParameter("activityId", activityId));
@@ -422,7 +422,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
                             float distance,
                             String distanceUnit,
                             LocalDate date,
-                            LocalDate startTime) throws FitbitAPIException {
+                            LocalTime startTime) throws FitbitAPIException {
 
         List<PostParameter> params = new ArrayList<PostParameter>(5);
         params.add(new PostParameter("activityId", activityId));
@@ -461,7 +461,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
                             float distance,
                             String distanceUnit,
                             LocalDate date,
-                            LocalDate startTime,
+                            LocalTime startTime,
                             int manualCalories) throws FitbitAPIException {
 
         List<PostParameter> params = new ArrayList<PostParameter>(5);
@@ -496,7 +496,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
                             String activityName,
                             int durationMillis,
                             LocalDate date,
-                            LocalDate startTime,
+                            LocalTime startTime,
                             int manualCalories) throws FitbitAPIException {
         List<PostParameter> params = new ArrayList<PostParameter>(5);
         params.add(new PostParameter("activityName", activityName));
@@ -529,7 +529,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
                             int durationMillis,
                             float distance,
                             LocalDate date,
-                            LocalDate startTime,
+                            LocalTime startTime,
                             int manualCalories) throws FitbitAPIException {
         List<PostParameter> params = new ArrayList<PostParameter>(6);
         params.add(new PostParameter("activityName", activityName));
@@ -565,7 +565,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
                             float distance,
                             String distanceUnit,
                             LocalDate date,
-                            LocalDate startTime,
+                            LocalTime startTime,
                             int manualCalories) throws FitbitAPIException {
         List<PostParameter> params = new ArrayList<PostParameter>(7);
         params.add(new PostParameter("activityName", activityName));
