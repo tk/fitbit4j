@@ -17,17 +17,20 @@ public class Serving {
     private int unitId;
     private double servingSize;
     private double multiplier;
+    private FoodUnit unit;
 
-    public Serving(int unitId, double servingSize, double multiplier) {
+    public Serving(int unitId, double servingSize, double multiplier, FoodUnit unit) {
         this.unitId = unitId;
         this.servingSize = servingSize;
         this.multiplier = multiplier;
+        this.unit = unit;
     }
 
     public Serving(JSONObject jsonObject) throws JSONException {
         this.unitId = jsonObject.getInt("unitId");
         this.servingSize = jsonObject.getDouble("servingSize");
         this.multiplier = jsonObject.getDouble("multiplier");
+        this.unit = new FoodUnit(jsonObject.getJSONObject("unit"));
     }
 
     public static List<Serving> jsonArrayToServingList(JSONArray array) throws JSONException {
@@ -49,5 +52,9 @@ public class Serving {
 
     public double getMultiplier() {
         return multiplier;
+    }
+
+    public FoodUnit getUnit() {
+        return unit;
     }
 }
