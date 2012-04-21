@@ -10,6 +10,7 @@ import com.fitbit.api.common.model.body.*;
 import com.fitbit.api.common.model.bp.Bp;
 import com.fitbit.api.common.model.bp.BpLog;
 import com.fitbit.api.common.model.devices.Device;
+import com.fitbit.api.common.model.devices.Scale;
 import com.fitbit.api.common.model.foods.*;
 import com.fitbit.api.common.model.glucose.Glucose;
 import com.fitbit.api.common.model.heart.Heart;
@@ -17,6 +18,7 @@ import com.fitbit.api.common.model.heart.HeartLog;
 import com.fitbit.api.common.model.sleep.Sleep;
 import com.fitbit.api.common.model.sleep.SleepLog;
 import com.fitbit.api.common.model.timeseries.*;
+import com.fitbit.api.common.model.units.UnitSystem;
 import com.fitbit.api.common.model.units.VolumeUnits;
 import com.fitbit.api.common.model.user.FriendStats;
 import com.fitbit.api.common.model.user.UserInfo;
@@ -1181,6 +1183,90 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
             return new Device(res.asJSONObject().getJSONObject("device"));
         } catch (JSONException e) {
             throw new FitbitAPIException("Error retrieving device: " + e, e);
+        }
+    }
+
+
+    /**
+     * Retrieves the list of user's scales
+     *
+     * @param localUser authorized user
+     *
+     * @return list of user's scales
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public List<Scale> getScales(LocalUserDetail localUser) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/-/devices/scale.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale", APIFormat.JSON);
+        Response response = httpGet(url, true);
+        throwExceptionIfError(response);
+        try {
+            return Scale.jsonArrayToScalesList(response.asJSONObject().getJSONArray("scales"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to list of Scale : ", e);
+        }
+    }
+
+    /**
+     * Retrieve the attributes of user's scale
+     *
+     * @param localUser authorized user
+     * @param deviceId scale serial number
+     *
+     * @return scale info
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public Scale getScale(LocalUserDetail localUser, String deviceId) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/-/devices/scale/A123D4.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId, APIFormat.JSON);
+        Response res = httpGet(url, true);
+        throwExceptionIfError(res);
+        try {
+            return new Scale(res.asJSONObject().getJSONObject("scale"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to scale : " + e, e);
+        }
+    }
+
+    /**
+     * Update scale settings
+     *
+     * @param localUser authorized user
+     * @param deviceId scale device id
+     * @param name scale name
+     * @param unitSystem unit system
+     * @param brightness brightness
+     *
+     * @return scale info
+     *
+     * @throws com.fitbit.api.FitbitAPIException Fitbit API Exception
+     */
+    public Scale updateScaleSettings(LocalUserDetail localUser, String deviceId, String name, UnitSystem unitSystem, Integer brightness) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: POST /1/user/-/devices/scale/A123D4.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId, APIFormat.JSON);
+
+        List<PostParameter> params = new ArrayList<PostParameter>();
+        if (name != null) {
+            params.add(new PostParameter("name", name));
+        }
+        if (unitSystem != null) {
+            params.add(new PostParameter("defaultUnit", unitSystem.getDisplayLocale()));
+        }
+        if (brightness != null) {
+            params.add(new PostParameter("brightness", brightness));
+        }
+
+        Response response = httpPost(url, params.toArray(new PostParameter[params.size()]), true);
+        throwExceptionIfError(response);
+        try {
+            return new Scale(response.asJSONObject().getJSONObject("scale"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to Scale : ", e);
         }
     }
 

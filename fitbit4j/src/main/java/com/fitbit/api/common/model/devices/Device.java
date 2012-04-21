@@ -19,16 +19,9 @@ public class Device {
      * The battery level of the Fitbit device, one of Low, Medium, High, and Full. The level is "Low" when no
      * information is available.
      */
-	private final String battery;
+    private final String battery;
 
-    private String lastSyncTime;
-
-    public Device(long id, DeviceType type, String battery, String lastSyncTime) {
-        this.id = id;
-        this.type = type;
-        this.battery = battery;
-        this.lastSyncTime = lastSyncTime;
-    }
+    private final String lastSyncTime;
 
     public Device(JSONObject json) throws JSONException {
         id = json.getLong("id");
@@ -70,39 +63,7 @@ public class Device {
         return battery;
     }
 
-    public void setLastSyncTime(String lastSyncTime) {
-        this.lastSyncTime = lastSyncTime;
-    }
-
     public String getLastSyncTime() {
         return lastSyncTime;
     }
-
-    @SuppressWarnings({"RedundantIfStatement"})
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Device)) return false;
-
-        Device device = (Device) o;
-
-        if (id != device.id) return false;
-        if (battery != null ? !battery.equals(device.battery) : device.battery != null) return false;
-        if (lastSyncTime != null ? !lastSyncTime.equals(device.lastSyncTime) : device.lastSyncTime != null)
-            return false;
-        if (type != device.type) return false;
-
-        return true;
-    }
-
-    @SuppressWarnings({"NumericCastThatLosesPrecision", "UnnecessaryParentheses"})
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (battery != null ? battery.hashCode() : 0);
-        result = 31 * result + (lastSyncTime != null ? lastSyncTime.hashCode() : 0);
-        return result;
-    }
-
 }
