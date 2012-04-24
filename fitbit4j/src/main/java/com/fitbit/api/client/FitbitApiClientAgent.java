@@ -1354,6 +1354,72 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
         throwExceptionIfError(response, HttpServletResponse.SC_NO_CONTENT);
     }
 
+    public List<ScaleMeasurementLog> getScaleMeasurementLogs(LocalUserDetail localUser, String deviceId, LocalDate startDate, TimePeriod timePeriod) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/-/devices/1234.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/measurements/date/" + startDate.toString() + "/" + timePeriod.getShortForm(), APIFormat.JSON);
+        Response response = httpGet(url, true);
+        throwExceptionIfError(response);
+        try {
+            return ScaleMeasurementLog.jsonArrayToMeasurementLogList(response.asJSONObject().getJSONArray("scaleMeasurements"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to list of ScaleMeasurementLog : ", e);
+        }
+    }
+
+    public List<ScaleMeasurementLog> getScaleMeasurementLogs(LocalUserDetail localUser, String deviceId, LocalDate startDate, LocalDate endDate) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/-/devices/1234.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/measurements/date/" + startDate.toString() + "/" + endDate.toString(), APIFormat.JSON);
+        Response response = httpGet(url, true);
+        throwExceptionIfError(response);
+        try {
+            return ScaleMeasurementLog.jsonArrayToMeasurementLogList(response.asJSONObject().getJSONArray("scaleMeasurements"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to list of ScaleMeasurementLog : ", e);
+        }
+    }
+
+    public ScaleMeasurementLog reassignScaleMeasurementLogToUser(LocalUserDetail localUser, String deviceId, Long scaleMeasurementLodId, FitbitUser fitbitUser) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: POST /1/user/-/devices/scale/A12D34/measurements/23436.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/measurements/" + scaleMeasurementLodId, APIFormat.JSON);
+        List<PostParameter> params = new ArrayList<PostParameter>();
+        params.add(new PostParameter("assignUserId", fitbitUser.getId()));
+
+        Response response = httpPost(url, params.toArray(new PostParameter[params.size()]), true);
+
+        try {
+            return new ScaleMeasurementLog(response.asJSONObject().getJSONObject("scaleMeasurementLog"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to scale measurement log: " + e, e);
+        }
+    }
+
+    public ScaleMeasurementLog assignScaleMeasurementLogToGuest(LocalUserDetail localUser, String deviceId, Long scaleMeasurementLodId) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: POST /1/user/-/devices/scale/A12D34//measurements/23436.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/measurements/" + scaleMeasurementLodId, APIFormat.JSON);
+        List<PostParameter> params = new ArrayList<PostParameter>();
+        params.add(new PostParameter("assignUserId", "GUEST"));
+
+        Response response = httpPost(url, params.toArray(new PostParameter[params.size()]), true);
+
+        try {
+            return new ScaleMeasurementLog(response.asJSONObject().getJSONObject("scaleMeasurementLog"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to scale measurement log: " + e, e);
+        }
+    }
+
+    public void deleteScaleMeasurementLog(LocalUserDetail localUser, String deviceId, Long scaleMeasurementLodId) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: DELETE /1/user/-/devices/scale/A12D34//measurements/23436.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/measurements/" + scaleMeasurementLodId, APIFormat.JSON);
+        Response response = httpDelete(url, true);
+        throwExceptionIfError(response, HttpServletResponse.SC_NO_CONTENT);
+    }
+
     public Response getCollectionResponseForDate(LocalUserDetail localUser, FitbitUser fitbitUser, APICollectionType type, LocalDate date) throws FitbitAPIException {
         setAccessToken(localUser);
         // Example: GET /1/user/228TQ4/foods/log/date/2010-02-25.json
@@ -2204,7 +2270,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
     /**
      * Get a list of user's friends
      *
-     * @param fitbitUser user to retrieve data from
+     * @param owner user to retrieve data from
      *
      * @return list of user's friends
      *
@@ -2221,7 +2287,7 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
      * Get a list of user's friends
      *
      * @param localUser authorized user
-     * @param fitbitUser user to retrieve data from
+     * @param owner user to retrieve data from
      *
      * @return list of user's friends
      *
