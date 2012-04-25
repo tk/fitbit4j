@@ -9,8 +9,7 @@ import com.fitbit.api.common.model.activities.*;
 import com.fitbit.api.common.model.body.*;
 import com.fitbit.api.common.model.bp.Bp;
 import com.fitbit.api.common.model.bp.BpLog;
-import com.fitbit.api.common.model.devices.Device;
-import com.fitbit.api.common.model.devices.Scale;
+import com.fitbit.api.common.model.devices.*;
 import com.fitbit.api.common.model.foods.*;
 import com.fitbit.api.common.model.glucose.Glucose;
 import com.fitbit.api.common.model.heart.Heart;
@@ -1268,6 +1267,91 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
         } catch (JSONException e) {
             throw new FitbitAPIException("Error parsing json response to Scale : ", e);
         }
+    }
+
+    public List<ScaleUser> getScaleUsers(LocalUserDetail localUser, String deviceId) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/-/devices/scale/AB1D234/users.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/users", APIFormat.JSON);
+        Response response = httpGet(url, true);
+        throwExceptionIfError(response);
+        try {
+            return ScaleUser.jsonArrayToScaleUsersList(response.asJSONObject().getJSONArray("scaleUsers"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to list of ScaleUser : ", e);
+        }
+    }
+
+    public ScaleUser updateScaleUser(LocalUserDetail localUser, String deviceId, String scaleUserName, BodyType bodyType) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: POST /1/user/-/devices/scale/AB1D234/users.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/users", APIFormat.JSON);
+        List<PostParameter> params = new ArrayList<PostParameter>();
+        if (scaleUserName != null) {
+            params.add(new PostParameter("scaleUserName", scaleUserName));
+        }
+        if (bodyType != null) {
+            params.add(new PostParameter("bodyType", bodyType.name()));
+        }
+
+        Response response = httpPost(url, params.toArray(new PostParameter[params.size()]), true);
+        throwExceptionIfError(response);
+
+        try {
+            return new ScaleUser(response.asJSONObject().getJSONObject("scaleUser"));
+        } catch (Exception e) {
+            throw new FitbitAPIException("Error parsing json response to ScaleUser : " + e, e);
+        }
+    }
+
+    public void deleteScaleUser(LocalUserDetail localUser, String deviceId, FitbitUser fitbitUser) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: DELETE /1/user/-/devices/scale/AB1D234/users/22PY5R.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/users/" + fitbitUser.getId(), APIFormat.JSON);
+        Response response = httpDelete(url, true);
+        throwExceptionIfError(response, HttpServletResponse.SC_NO_CONTENT);
+    }
+
+    public List<ScaleInviteSendingResult> inviteUsersToScale(LocalUserDetail localUser, String deviceId, String invitedUserEmails, String message) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: POST /1/user/-/devices/scale/AB1D234/users/invitations.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/users/invitations", APIFormat.JSON);
+        List<PostParameter> params = new ArrayList<PostParameter>();
+        params.add(new PostParameter("invitedUserEmails", invitedUserEmails));
+        if (message != null) {
+            params.add(new PostParameter("message", message));
+        }
+
+        Response response = httpPost(url, params.toArray(new PostParameter[params.size()]), true);
+        throwExceptionIfError(response, HttpServletResponse.SC_CREATED);
+
+        try {
+            return ScaleInviteSendingResult.jsonArrayToScaleInviteSendingResultsList(response.asJSONObject().getJSONArray("scaleInviteSendingResults"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to list of ScaleInviteSendingResult : ", e);
+        }
+    }
+
+    public List<ScaleInvite> getScaleInvites(LocalUserDetail localUser, String deviceId) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: GET /1/user/-/devices/scale/AB1D234/users/invitations.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/users/invitations", APIFormat.JSON);
+        Response response = httpGet(url, true);
+        throwExceptionIfError(response);
+        try {
+            return ScaleInvite.jsonArrayToScaleInvitesList(response.asJSONObject().getJSONArray("scaleInvites"));
+        } catch (JSONException e) {
+            throw new FitbitAPIException("Error parsing json response to list of ScaleInvite : ", e);
+        }
+    }
+
+    public void deleteScaleInvite(LocalUserDetail localUser, String deviceId, Long invite) throws FitbitAPIException {
+        setAccessToken(localUser);
+        // Example: DELETE /1/user/-/devices/scale/AB1D234/users/invitations/21145.json
+        String url = APIUtil.contextualizeUrl(getApiBaseUrl(), getApiVersion(), "/user/-/devices/scale/" + deviceId + "/users/invitations/" + invite, APIFormat.JSON);
+
+        Response response = httpDelete(url, true);
+        throwExceptionIfError(response, HttpServletResponse.SC_NO_CONTENT);
     }
 
     public Response getCollectionResponseForDate(LocalUserDetail localUser, FitbitUser fitbitUser, APICollectionType type, LocalDate date) throws FitbitAPIException {
@@ -2657,6 +2741,12 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
 
     public static void throwExceptionIfError(Response res) throws FitbitAPIException {
         if (res.isError()) {
+            throw new FitbitAPIException(getErrorMessage(res));
+        }
+    }
+
+    public static void throwExceptionIfError(Response res, int expectedStatusCode) throws FitbitAPIException {
+        if (res.getStatusCode() != expectedStatusCode) {
             throw new FitbitAPIException(getErrorMessage(res));
         }
     }

@@ -42,7 +42,11 @@ public class UserInfo {
     private String glucoseUnit;
 
     public UserInfo(JSONObject json) throws JSONException {
-        JSONObject userJson = json.getJSONObject("user");
+        this(json, true);
+    }
+
+    public UserInfo(JSONObject jsonObject, boolean wrapped) throws JSONException {
+        JSONObject userJson = wrapped ? jsonObject.getJSONObject("user") : jsonObject;
         encodedId = userJson.getString("encodedId");
         displayName = userJson.getString("displayName");
         gender = Gender.valueOf(userJson.getString("gender"));
@@ -62,6 +66,7 @@ public class UserInfo {
         offsetFromUTCMillis = userJson.optInt("offsetFromUTCMillis");
         locale = userJson.optString("locale");
         avatar = userJson.optString("avatar");
+
         weightUnit = userJson.optString("weightUnit");
         distanceUnit = userJson.optString("distanceUnit");
         heightUnit = userJson.optString("weightUnit");
