@@ -2945,4 +2945,12 @@ public class FitbitApiClientAgent extends FitbitAPIClientSupport implements Seri
             throw new FitbitAPIException("Error deleting fat: " + e, e);
         }
     }
+
+    public void setLocalization(Locale locale) {
+        if (locale == null) {
+            http.removeRequestHeader("Accept-Locale");
+        } else {
+            http.setRequestHeader("Accept-Locale", locale.toString());
+        }
+    }
 }
