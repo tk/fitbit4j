@@ -13,7 +13,7 @@ public class Device {
     /**
      * Device id
      */
-    private final long id;
+    private final String id;
     private final DeviceType type;
     /**
      * The battery level of the Fitbit device, one of Low, Medium, High, and Full. The level is "Low" when no
@@ -22,12 +22,14 @@ public class Device {
     private final String battery;
 
     private final String lastSyncTime;
+    private final String deviceVersion;
 
     public Device(JSONObject json) throws JSONException {
-        id = json.getLong("id");
+        id = json.getString("id");
         type =  DeviceType.valueOf(json.getString("type"));
         battery = json.getString("battery");
         lastSyncTime = json.getString("lastSyncTime");
+        deviceVersion = json.getString("deviceVersion");
     }
 
     public static List<Device> constructDeviceList(Response res) throws FitbitAPIException {
@@ -47,7 +49,7 @@ public class Device {
         return deviceList;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
@@ -65,5 +67,9 @@ public class Device {
 
     public String getLastSyncTime() {
         return lastSyncTime;
+    }
+
+    public String getDeviceVersion() {
+        return deviceVersion;
     }
 }
