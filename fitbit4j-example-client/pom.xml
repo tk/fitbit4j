@@ -22,6 +22,32 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <plugins>
+	      <plugin>
+	        <groupId>org.codehaus.cargo</groupId>
+	        <artifactId>cargo-maven2-plugin</artifactId>
+	        <version>1.4.8</version>
+	        <configuration>
+		        <deployables>
+					<deployable>
+						<groupId>com.fitbit</groupId>
+						<artifactId>fitbit-example-client</artifactId>
+						<type>war</type>
+						<properties>
+							<context>/</context>
+						</properties>
+					</deployable>
+				</deployables>
+	        </configuration>
+	      </plugin>
+	      <plugin>
+	           <artifactId>maven-war-plugin</artifactId>
+	           <version>2.3</version>
+	           <configuration>
+	               <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+	           </configuration>
+	       </plugin>
+	    </plugins>
     </build>
 
     <dependencies>
